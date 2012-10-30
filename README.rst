@@ -177,17 +177,16 @@ Known issues
 ------------
 
 1. If slicing or ``xfilter`` is used, reported ``len()`` is computed by
-   iterating over all iterables so performance is weak. Note that
-   ``len()`` is used by ``list()`` when you convert your lazy chain to
-   a list or when iterating over the lazy chain in Django templates.
-   If this is not expected, you can convert to a list using a workaround
-   like this::
+   iterating over all iterables so performance is weak. Note that ``len()`` is
+   used by ``list()`` when you convert your chain to a list or when iterating
+   over the chain in Django templates.  If this is not expected, you can convert
+   to a list using a workaround like this::
 
        list(e for e in some_chain)
 
-2. Indexing on lazy chains uses iteration underneath so performance
-   is weak. This feature is only available as a last resort. Slicing on the
-   other hand is also lazy.
+2. Indexing on chains uses iteration underneath so performance is weak. This
+   feature is only available as a last resort. Slicing on the other hand is also
+   lazy.
 
 
 How do I run the tests?

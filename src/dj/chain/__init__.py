@@ -57,17 +57,16 @@ class chain(object):
     Known issues:
 
     1. If slicing or ``xfilter`` is used, reported ``len()`` is computed by
-       iterating over all iterables so performance is weak. Note that
-       ``len()`` is used by ``list()`` when you convert your lazy chain to
-       a list or when iterating over the lazy chain in Django templates.
-       If this is not expected, you can convert to a list using a workaround
-       like this::
+       iterating over all iterables so performance is weak. Note that ``len()``
+       is used by ``list()`` when you convert your chain to a list or when
+       iterating over the chain in Django templates. If this is not expected,
+       you can convert to a list using a workaround like this::
 
            list(e for e in some_chain)
 
-    2. Indexing on lazy chains uses iteration underneath so performance
-       is weak. This feature is only available as a last resort. Slicing on the
-       other hand is also lazy."""
+    2. Indexing on chains uses iteration underneath so performance is weak.
+       This feature is only available as a last resort. Slicing on the other
+       hand is also lazy."""
 
     def __init__(self, *iterables):
         self.iterables = iterables
@@ -99,7 +98,7 @@ class chain(object):
         return value
 
     def copy(self, *iterables):
-        """Returns a copy of this lazy chain. If `iterables` are provided,
+        """Returns a copy of this chain. If `iterables` are provided,
         they are used instead of the ones in the current object."""
         if not iterables:
             iterables = self.iterables
@@ -164,22 +163,22 @@ class chain(object):
             if any((key.start and key.start < 0,
                     key.stop and key.stop < 0,
                     key.step and key.step < 0)):
-                raise ValueError("lazy chains do not support negative indexing")
+                raise ValueError("chains do not support negative indexing")
             result = self.copy()
             result.start = key.start
             result.stop = key.stop
             result.step = key.step
         elif isinstance(key, int):
             if key < 0:
-                raise ValueError("lazy chains do not support negative indexing")
+                raise ValueError("chains do not support negative indexing")
             self_without_transform = self.copy()
             self_without_transform.xform = lambda x: x
             for index, elem in enumerate(self_without_transform):
                 if index == key:
                     return self.xform(elem)
-            raise IndexError("lazy chain index out of range")
+            raise IndexError("chain index out of range")
         else:
-            raise ValueError("lazy chain supports only integer indexing and "
+            raise ValueError("chain supports only integer indexing and "
                 "slices.")
 
         return result
