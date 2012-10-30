@@ -43,7 +43,7 @@ class chain(object):
     Provides special overridable static methods used while yielding values:
 
       * ``xfilter(value)`` - yield a value only if ``xfilter(value)`` returns
-                             ``True``. See known issues belowe.
+                             ``True``. See known issues below.
 
       * ``xform(value)`` - transforms the value JIT before yielding it back.
                            It is only called for values within the specified
@@ -120,11 +120,7 @@ class chain(object):
         return result
 
     def __iter__(self):
-        try:
-            sorting = self.xkey() is not unset
-        except TypeError:
-            sorting = True
-        if sorting:
+        if self.ordered:
             def _gen():
                 candidates = {}
                 for iterable in self.iterables:
@@ -157,7 +153,7 @@ class chain(object):
         for index, element in enumerate(_gen()):
             if self.start and index < self.start:
                 continue
-            if self.step and index % self.step:
+            if self.step and (index - (self.start or 0)) % self.step:
                 continue
             if self.stop and index >= self.stop:
                 break
@@ -255,4 +251,19 @@ class chain(object):
     def order_by(self, *args, **kwargs):
         """Queryset-compatible ``order_by`` method. Will silently skip ordering
         for incompatible iterables."""
-        return self._django_factory('order_by', *args, **kwargs)
+        result = self._django_factory('order_by', *args, **kwargs)
+        def xkey(value):
+            for name in args:
+                if name.startswith('-'):
+                    yield -getattr(value, name[1:])
+                else:
+                    yield getattr(value, name)
+        result.xkey = lambda v: list(xkey(v))
+        return result
+
+    @property
+    def ordered(self):
+        try:
+            return self.xkey() is not unset
+        except TypeError:
+            return True
