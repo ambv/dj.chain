@@ -21,10 +21,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-"""Module name
-   ----
+"""dj.chain
+   --------
 
-   description"""
+    This module provides a way to chain multiple finite iterables for
+    consumption as a queryset-compatible object."""
 
 from __future__ import absolute_import
 from __future__ import division
