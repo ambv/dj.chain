@@ -74,6 +74,7 @@ class chain(object):
         self.start = None
         self.stop = None
         self.step = None
+        self.xsort = []
 
     @staticmethod
     def xform(value):
@@ -107,6 +108,7 @@ class chain(object):
         result.xfilter = self.xfilter
         result.xform = self.xform
         result.xkey = self.xkey
+        result.xsort = list(self.xsort)
         result.start = self.start
         result.stop = self.stop
         result.step = self.step
@@ -131,8 +133,15 @@ class chain(object):
                     except StopIteration:
                         continue
                 while candidates:
+                    clist = candidates.values()
+                    for rule in self.xsort[::-1]:
+                        reverse = rule[0] == '-'
+                        if reverse:
+                            rule = rule[1:]
+                        clist.sort(key=lambda x: getattr(x[0], rule),
+                            reverse=reverse)
                     try:
-                        to_yield, iterator = min(candidates.viewvalues(),
+                        to_yield, iterator = min(clist,
                             key=lambda x: self.xkey(x[0]))
                         yield to_yield
                     except ValueError:
@@ -181,7 +190,6 @@ class chain(object):
         else:
             raise ValueError("chain supports only integer indexing and "
                 "slices.")
-
         return result
 
     def __len_parts__(self):
@@ -252,18 +260,17 @@ class chain(object):
         """Queryset-compatible ``order_by`` method. Will silently skip ordering
         for incompatible iterables."""
         result = self._django_factory('order_by', *args, **kwargs)
-        def xkey(value):
-            for name in args:
-                if name.startswith('-'):
-                    yield -getattr(value, name[1:])
-                else:
-                    yield getattr(value, name)
-        result.xkey = lambda v: list(xkey(v))
+        result.xsort.extend(args)
+        try:
+            if self.xkey() is unset:
+                result.xkey = lambda v: 0
+        except TypeError:
+            pass
         return result
 
     @property
     def ordered(self):
         try:
-            return self.xkey() is not unset
+            return len(self.xsort) or self.xkey() is not unset
         except TypeError:
             return True
