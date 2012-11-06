@@ -168,9 +168,8 @@ Chains provide special overridable static methods used while yielding values:
 
 * ``xkey(value)`` - returns a value to be used in comparison between elements if
   sorting should be used. Individual iterables should be presorted for the
-  complete result to be sorted properly.
-
-Cumulative ``order_by`` overrides any static ``xkey`` methods provided. 
+  complete result to be sorted properly. Any cumulative ``order_by`` clauses are
+  executed before the ``xkey`` method is used. 
 
 
 Known issues
