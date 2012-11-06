@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2011 - 2012 by Łukasz Langa
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -38,8 +38,8 @@ from lck.lang import unset
 
 class chain(object):
     """Enables chaining multiple iterables to serve them lazily as
-    a queryset-compatible object. Supports collective ``count()``, ``exists()``,
-    ``exclude``, ``filter`` and ``order_by`` methods.
+    a queryset-compatible object. Supports collective ``count()``,
+    ``exists()``, ``exclude``, ``filter`` and ``order_by`` methods.
 
     Provides special overridable static methods used while yielding values:
 
@@ -129,7 +129,7 @@ class chain(object):
                     iterator = iter(iterable)
                     try:
                         candidates[iterator] = [self._filtered_next(iterator),
-                            iterator]
+                                                iterator]
                     except StopIteration:
                         continue
                 while candidates:
@@ -139,21 +139,21 @@ class chain(object):
                         if reverse:
                             rule = rule[1:]
                         clist.sort(key=lambda x: getattr(x[0], rule),
-                            reverse=reverse)
+                                   reverse=reverse)
                     try:
                         to_yield, iterator = min(clist,
-                            key=lambda x: self.xkey(x[0]))
+                                                 key=lambda x: self.xkey(x[0]))
                         yield to_yield
                     except ValueError:
                         # sequence empty
                         break
                     try:
                         candidates[iterator] = [self._filtered_next(iterator),
-                            iterator]
+                                                iterator]
                     except StopIteration:
                         del candidates[iterator]
         else:
-            def _gen():
+            def _gen():  # noqa
                 for it in self.iterables:
                     for element in it:
                         if not self.xfilter(element):
@@ -189,7 +189,7 @@ class chain(object):
             raise IndexError("chain index out of range")
         else:
             raise ValueError("chain supports only integer indexing and "
-                "slices.")
+                             "slices.")
         return result
 
     def __len_parts__(self):
@@ -219,7 +219,7 @@ class chain(object):
         length = 0
         for length, _ in enumerate(self):
             pass
-        return length+1
+        return length + 1
 
     def _django_factory(self, _method, *args, **kwargs):
         new_iterables = []

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2012 by Łukasz Langa
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -34,25 +34,25 @@ from django.test import TestCase
 class SimpleTest(TestCase):
     def test_dummy(self):
         """Just see if the import works as expected."""
-        from dj import chain
+        from dj import chain  # noqa
 
     def test_chain_simple(self, c=None):
         from dj.chain import chain
         if not c:
-            c = chain((1,2), [3,4], "56")
+            c = chain((1, 2), [3, 4], "56")
             c.xform = lambda v: int(v)
             c.xfilter = lambda v: int(v) % 2 == 0
-        self.assertEqual((2,4,6), tuple(c))
+        self.assertEqual((2, 4, 6), tuple(c))
         self.assertEqual(3, len(c))
-        self.assertEqual((4,6), tuple(c[1:]))
+        self.assertEqual((4, 6), tuple(c[1:]))
         self.assertEqual(2, len(c[1:]))
-        self.assertEqual((4,6), tuple(c[1:3]))
+        self.assertEqual((4, 6), tuple(c[1:3]))
         self.assertEqual(2, len(c[1:3]))
-        self.assertEqual((2,4), tuple(c[:2]))
+        self.assertEqual((2, 4), tuple(c[:2]))
         self.assertEqual(2, len(c[:2]))
         self.assertEqual((2,), tuple(c[:2:2]))
         self.assertEqual(1, len(c[:2:2]))
-        self.assertEqual((2,6), tuple(c[::2]))
+        self.assertEqual((2, 6), tuple(c[::2]))
         self.assertEqual(2, len(c[::2]))
         self.assertEqual(6, c[2])
 
@@ -62,17 +62,17 @@ class SimpleTest(TestCase):
         except IndexError:
             pass
         c.xfilter = lambda v: True
-        self.assertEqual((1,2,3,4,5,6), tuple(c))
+        self.assertEqual((1, 2, 3, 4, 5, 6), tuple(c))
         self.assertEqual(6, len(c))
-        self.assertEqual((5,6), tuple(c[4:]))
+        self.assertEqual((5, 6), tuple(c[4:]))
         self.assertEqual(2, len(c[4:]))
-        self.assertEqual((3,4), tuple(c[2:4]))
+        self.assertEqual((3, 4), tuple(c[2:4]))
         self.assertEqual(2, len(c[2:4]))
-        self.assertEqual((1,2,3,4), tuple(c[:4]))
+        self.assertEqual((1, 2, 3, 4), tuple(c[:4]))
         self.assertEqual(4, len(c[:4]))
-        self.assertEqual((1,3), tuple(c[:4:2]))
+        self.assertEqual((1, 3), tuple(c[:4:2]))
         self.assertEqual(2, len(c[:4:2]))
-        self.assertEqual((1,4), tuple(c[::3]))
+        self.assertEqual((1, 4), tuple(c[::3]))
         self.assertEqual(2, len(c[::3]))
         self.assertEqual(6, c[5])
         try:
@@ -93,7 +93,7 @@ class SimpleTest(TestCase):
 
     def test_chain_simple_copy(self):
         from dj.chain import chain
-        c = chain((1,2), [3,4], "56")
+        c = chain((1, 2), [3, 4], "56")
         c.xform = lambda v: int(v)
         c.xfilter = lambda v: int(v) % 2 == 0
         c2 = c.copy(*c.iterables)
@@ -102,21 +102,21 @@ class SimpleTest(TestCase):
     def test_chain_sorted(self, c=None):
         from dj.chain import chain
         if not c:
-            c = chain((1,2), [3,4], "56")
+            c = chain((1, 2), [3, 4], "56")
             c.xform = lambda v: int(v)
             c.xkey = lambda v: -int(v)
             c.xfilter = lambda v: int(v) % 2 == 0
-        self.assertEqual((6,4,2), tuple(c))
+        self.assertEqual((6, 4, 2), tuple(c))
         self.assertEqual(3, len(c))
-        self.assertEqual((4,2), tuple(c[1:]))
+        self.assertEqual((4, 2), tuple(c[1:]))
         self.assertEqual(2, len(c[1:]))
-        self.assertEqual((4,2), tuple(c[1:3]))
+        self.assertEqual((4, 2), tuple(c[1:3]))
         self.assertEqual(2, len(c[1:3]))
-        self.assertEqual((6,4), tuple(c[:2]))
+        self.assertEqual((6, 4), tuple(c[:2]))
         self.assertEqual(2, len(c[:2]))
         self.assertEqual((6,), tuple(c[:2:2]))
         self.assertEqual(1, len(c[:2:2]))
-        self.assertEqual((6,2), tuple(c[::2]))
+        self.assertEqual((6, 2), tuple(c[::2]))
         self.assertEqual(2, len(c[::2]))
         self.assertEqual(2, c[2])
         try:
@@ -125,17 +125,17 @@ class SimpleTest(TestCase):
         except IndexError:
             pass
         c.xfilter = lambda v: True
-        self.assertEqual((5,6,3,4,1,2), tuple(c))
+        self.assertEqual((5, 6, 3, 4, 1, 2), tuple(c))
         self.assertEqual(6, len(c))
-        self.assertEqual((1,2), tuple(c[4:]))
+        self.assertEqual((1, 2), tuple(c[4:]))
         self.assertEqual(2, len(c[4:]))
-        self.assertEqual((3,4), tuple(c[2:4]))
+        self.assertEqual((3, 4), tuple(c[2:4]))
         self.assertEqual(2, len(c[2:4]))
-        self.assertEqual((5,6,3,4), tuple(c[:4]))
+        self.assertEqual((5, 6, 3, 4), tuple(c[:4]))
         self.assertEqual(4, len(c[:4]))
-        self.assertEqual((5,3), tuple(c[:4:2]))
+        self.assertEqual((5, 3), tuple(c[:4:2]))
         self.assertEqual(2, len(c[:4:2]))
-        self.assertEqual((5,4), tuple(c[::3]))
+        self.assertEqual((5, 4), tuple(c[::3]))
         self.assertEqual(2, len(c[::3]))
         self.assertEqual(2, c[5])
         try:
@@ -156,7 +156,7 @@ class SimpleTest(TestCase):
 
     def test_chain_sorted_copy(self):
         from dj.chain import chain
-        c = chain((1,2), [3,4], "56")
+        c = chain((1, 2), [3, 4], "56")
         c.xform = lambda v: int(v)
         c.xkey = lambda v: -int(v)
         c.xfilter = lambda v: int(v) % 2 == 0
@@ -165,7 +165,7 @@ class SimpleTest(TestCase):
 
     def test_chain_sorted_django_factory(self):
         from dj.chain import chain
-        c = chain(("8",1,2,"8"), [8,3,4,8], "8568")
+        c = chain(("8", 1, 2, "8"), [8, 3, 4, 8], "8568")
         c.xform = lambda v: int(v)
         c.xkey = lambda v: -int(v)
         c.xfilter = lambda v: int(v) % 2 == 0
@@ -176,44 +176,44 @@ class SimpleTest(TestCase):
 class MediaTest(TestCase):
     def setUp(self):
         from dj._chaintestproject.app.models import Video, Song
-        v1=Video(
+        v1 = Video(
             author='Psy', title='Gangnam Style', duration=253, resolution=5,
         )
         v1.save()
-        v2=Video(
+        v2 = Video(
             author='Justin Bieber', title='Baby', duration=225, resolution=4,
         )
         v2.save()
-        v3=Video(
+        v3 = Video(
             author='Lady Gaga', title='Bad Romance', duration=308,
             resolution=2
         )
         v3.save()
-        v4=Video(
+        v4 = Video(
             author='Shakira', title='Waka Waka', duration=211, resolution=3,
         )
         v4.save()
-        s1=Song(
+        s1 = Song(
             artist='Gotye feat. Kimbra', title='Somebody That I Used to Know',
             duration=244, genre=2,
         )
         s1.save()
-        s2=Song(
+        s2 = Song(
             artist='Coldplay', title='Clocks', duration=307, genre=3,
         )
         s2.save()
-        s3=Song(
+        s3 = Song(
             artist='Muse', title='Madness', duration=279, genre=1,
         )
         s3.save()
-        s4=Song(
+        s4 = Song(
             artist='Florence + The Machine', title='Spectrum', duration=218,
             genre=2,
         )
         s4.save()
         from collections import namedtuple
         Book = namedtuple('Book', "author title page_count")
-        self.books=(
+        self.books = (
             Book(
                 author='Charles Dickens', title='A Tale of Two Cities',
                 page_count=869,
@@ -236,20 +236,23 @@ class MediaTest(TestCase):
         from dj.chain import chain
         media = chain(self.Video.objects.all(), self.Song.objects.all())
         self.assertEqual(media.count(), 8)
-        self.assertEqual(list(media.filter(duration__gt=250)),
+        self.assertEqual(
+            list(media.filter(duration__gt=250)),
             list(self.Video.objects.filter(title__in=('Gangnam Style',
-                'Bad Romance')).order_by('-title')) +
+                 'Bad Romance')).order_by('-title')) +
             list(self.Song.objects.filter(title__in=('Clocks',
-                'Madness')).order_by('title'))
+                 'Madness')).order_by('title'))
         )
         self.assertEqual(media.filter(duration__gt=250).count(), 4)
-        self.assertEqual(media.filter(duration__gt=250)[1],
+        self.assertEqual(
+            media.filter(duration__gt=250)[1],
             self.Video.objects.get(title='Bad Romance')
         )
-        self.assertEqual(list(media[3:6]),
+        self.assertEqual(
+            list(media[3:6]),
             [self.Video.objects.get(title='Waka Waka')] +
             list(self.Song.objects.filter(artist__in=('Gotye feat. Kimbra',
-                'Coldplay')).order_by('-artist'))
+                 'Coldplay')).order_by('-artist'))
         )
         self.assertEqual(list(media[1::3]), [
             self.Video.objects.get(title='Baby'),
