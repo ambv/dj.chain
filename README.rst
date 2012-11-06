@@ -187,6 +187,9 @@ Known issues
    feature is only available as a last resort. Slicing on the other hand is also
    lazy.
 
+3. Collective ``filter`` and ``exclude`` silently skip filtering on incompatible
+   iterables. Use ``xfilter(value)`` as a workaround.
+
 
 How do I run the tests?
 -----------------------
@@ -208,7 +211,7 @@ Change Log
 
 * fix for slices with custom steps
 
-* PEP8-fied the accessor APIs
+* PEP8-fied all sources 
 
 
 Authors

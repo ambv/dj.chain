@@ -257,8 +257,9 @@ class chain(object):
         return chain()
 
     def order_by(self, *args, **kwargs):
-        """Queryset-compatible ``order_by`` method. Will silently skip ordering
-        for incompatible iterables."""
+        """Queryset-compatible ``order_by`` method. Also supports iterables
+        other than querysets but they need to be presorted for the chain to
+        return consistently ordered results."""
         result = self._django_factory('order_by', *args, **kwargs)
         result.xsort.extend(args)
         try:
