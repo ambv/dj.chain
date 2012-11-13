@@ -317,3 +317,26 @@ class MediaTest(TestCase):
         # No descending test since it would have rendered incorrect results
         # anyway: non-queryset iterables have to be presorted for the result
         # to be correctly ordered.
+
+    def test_strict_chain(self):
+        from dj.chain import chain
+        class extra_list(list):
+            def extra(self, *args, **kwargs):
+                raise Exception("extra called")
+        books = extra_list(self.books)
+        default_media = chain(
+            self.Video.objects.all(), self.Song.objects.all(), books,
+        )
+        with self.assertRaises(Exception):
+            default_media.extra(where=['id IN (2, 4, 6)'])
+        strict_media = chain(
+            self.Video.objects.all(), self.Song.objects.all(), books,
+            strict=True,
+        )
+        strict_media_extra = strict_media.extra(where=['id IN (2, 4, 6)'])
+        self.assertEqual(strict_media_extra[0].title, 'Baby')
+        self.assertEqual(strict_media_extra[1].title, 'Waka Waka')
+        self.assertEqual(strict_media_extra[2].title, 'Clocks')
+        self.assertEqual(strict_media_extra[3].title, 'Spectrum')
+        self.assertEqual(strict_media_extra[4].title, 'A Tale of Two Cities')
+        self.assertEqual(strict_media_extra[5].title, 'Don Quixote')

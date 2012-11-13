@@ -25,7 +25,7 @@
    --------
 
     This module provides a way to chain multiple finite iterables for
-    consumption as a queryset-compatible object."""
+    consumption as a QuerySet-compatible object."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -38,8 +38,9 @@ from lck.lang import unset
 
 class chain(object):
     """Enables chaining multiple iterables to serve them lazily as
-    a queryset-compatible object. Supports collective ``count()``,
-    ``exists()``, ``exclude``, ``filter`` and ``order_by`` methods.
+    a QuerySet-compatible object. Supports collective ``count()``, ``defer``,
+    ``exists()``, ``exclude``, ``extra``, ``filter``, ``only``, ``order_by``,
+    ``select_related`` and ``using`` methods.
 
     Provides special overridable static methods used while yielding values:
 
@@ -69,12 +70,17 @@ class chain(object):
        This feature is only available as a last resort. Slicing on the other
        hand is also lazy."""
 
-    def __init__(self, *iterables):
+    def __init__(self, *iterables, **kwargs):
         self.iterables = iterables
         self.start = None
         self.stop = None
         self.step = None
+        self.strict = kwargs.get('strict', False)
         self.xsort = []
+        if self.strict:
+            self._django_factory = self._strict_django_factory
+        else:
+            self._django_factory = self._default_django_factory
 
     @staticmethod
     def xform(value):
@@ -112,6 +118,7 @@ class chain(object):
         result.start = self.start
         result.stop = self.stop
         result.step = self.step
+        result.strict = self.strict
         return result
 
     def _filtered_next(self, iterator):
@@ -221,12 +228,23 @@ class chain(object):
             pass
         return length + 1
 
-    def _django_factory(self, _method, *args, **kwargs):
+    def _default_django_factory(self, _method, *args, **kwargs):
         new_iterables = []
         for it in self.iterables:
             try:
                 new_iterables.append(getattr(it, _method)(*args, **kwargs))
-            except (AttributeError, ValueError, FieldError):
+            except (AttributeError, ValueError, TypeError, FieldError):
+                new_iterables.append(it)
+        return self.copy(*new_iterables)
+
+    def _strict_django_factory(self, _method, *args, **kwargs):
+        # imported here to avoid settings.py bootstrapping issues
+        from django.db.models.query import QuerySet
+        new_iterables = []
+        for it in self.iterables:
+            if isinstance(it, QuerySet):
+                new_iterables.append(getattr(it, _method)(*args, **kwargs))
+            else:
                 new_iterables.append(it)
         return self.copy(*new_iterables)
 
@@ -234,31 +252,46 @@ class chain(object):
         return self
 
     def count(self):
-        """Queryset-compatible ``count`` method. Supports multiple iterables.
+        """QuerySet-compatible ``count`` method. Supports multiple iterables.
         """
         return len(self)
 
+    def defer(self, *args, **kwargs):
+        """QuerySet-compatible ``defer`` method. Will silently skip filtering
+        for incompatible iterables."""
+        return self._django_factory('defer', *args, **kwargs)
+
     def exclude(self, *args, **kwargs):
-        """Queryset-compatible ``filter`` method. Will silently skip filtering
+        """QuerySet-compatible ``exclude`` method. Will silently skip filtering
         for incompatible iterables."""
         return self._django_factory('exclude', *args, **kwargs)
 
     def exists(self):
-        """Queryset-compatible ``exists`` method. Supports multiple iterables.
+        """QuerySet-compatible ``exists`` method. Supports multiple iterables.
         """
         return bool(len(self))
 
+    def extra(self, *args, **kwargs):
+        """QuerySet-compatible ``extra`` method. Will silently skip filtering
+        for incompatible iterables."""
+        return self._django_factory('extra', *args, **kwargs)
+
     def filter(self, *args, **kwargs):
-        """Queryset-compatible ``filter`` method. Will silently skip filtering
+        """QuerySet-compatible ``filter`` method. Will silently skip filtering
         for incompatible iterables."""
         return self._django_factory('filter', *args, **kwargs)
 
     def none(self, *args, **kwargs):
         return chain()
 
+    def only(self, *args, **kwargs):
+        """QuerySet-compatible ``only`` method. Will silently skip filtering
+        for incompatible iterables."""
+        return self._django_factory('only', *args, **kwargs)
+
     def order_by(self, *args, **kwargs):
-        """Queryset-compatible ``order_by`` method. Also supports iterables
-        other than querysets but they need to be presorted for the chain to
+        """QuerySet-compatible ``order_by`` method. Also supports iterables
+        other than QuerySets but they need to be presorted for the chain to
         return consistently ordered results."""
         result = self._django_factory('order_by', *args, **kwargs)
         result.xsort.extend(args)
@@ -275,3 +308,13 @@ class chain(object):
             return len(self.xsort) or self.xkey() is not unset
         except TypeError:
             return True
+
+    def select_related(self, *args, **kwargs):
+        """QuerySet-compatible ``select_related`` method. Will silently skip filtering
+        for incompatible iterables."""
+        return self._django_factory('select_related', *args, **kwargs)
+
+    def using(self, *args, **kwargs):
+        """QuerySet-compatible ``using`` method. Will silently skip filtering
+        for incompatible iterables."""
+        return self._django_factory('using', *args, **kwargs)

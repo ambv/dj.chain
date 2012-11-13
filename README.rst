@@ -3,7 +3,7 @@ dj.chain
 ========
 
 This module provides a way to chain multiple finite iterables for consumption as
-a queryset-compatible object.
+a QuerySet-compatible object.
 
 
 Quickstart
@@ -66,7 +66,7 @@ Let's create a simple chain::
   >>> from dj.chain import chain
   >>> media = chain(Video.objects.all(), Song.objects.all())
 
-We can collectively call queryset-related methods on it::
+We can collectively call QuerySet-related methods on it::
 
   >>> media.count()
   8
@@ -122,7 +122,7 @@ Etc.
 Chaining heterogenic iterables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We can add iterables that aren't querysets to the bunch::
+We can add iterables that aren't QuerySets to the bunch::
 
   >>> from collections import namedtuple
   >>> Book = namedtuple('Book', "author title page_count")
@@ -142,7 +142,7 @@ We can add iterables that aren't querysets to the bunch::
    Book(author='Miguel de Cervantes', title='Don Quixote', page_count=1212)]
 
 You can also use cumulative ordering in this case. The only thing you need to
-keep in mind is that iterables which are not querysets should be presorted for
+keep in mind is that iterables which are not QuerySets should be presorted for
 the cumulative result to be ordered correctly. An example::
 
   >>> list(media.order_by('title'))
@@ -170,6 +170,40 @@ Chains provide special overridable static methods used while yielding values:
   sorting should be used. Individual iterables should be presorted for the
   complete result to be sorted properly. Any cumulative ``order_by`` clauses are
   executed before the ``xkey`` method is used. 
+
+
+Methods silently ignored on incompatible iterables
+--------------------------------------------------
+
+Chains may contain both QuerySet-like objects and other iterables. There are
+methods which apply only to the former if called collectively on the chain
+object. These are:
+
+* ``defer``
+
+* ``exclude``
+
+* ``extra``
+
+* ``filter``
+
+* ``only``
+
+* ``select_related``
+
+* ``using``
+
+By default ``dj.chain`` considers any iterable a QuerySet-like object as long as
+it has a method required for the collective call. For example if your custom
+iterable supports a ``defer`` method, it will be used on collective ``defer``
+calls. If that behaviour is undesirable, you should pass ``strict=True`` when
+constructing a chain::
+
+  c = chain(Article.objects.all(), custom_entries, strict=True)
+
+In this case the above methods will only be called on actual QuerySet instances.
+Note that methods with custom handling of other itables (like ``count`` and
+``order_by``) still work.
 
 
 Known issues
@@ -202,12 +236,21 @@ The easiest way would be to run::
 Change Log
 ----------
 
+0.9.1
+~~~~~
+
+* support for collective ``defer``, ``extra``, ``only``, ``select_related`` and
+  ``using`` methods (silently ignored for incompatible iterables)
+
+* strict mode (non-QuerySet objects are not tried for compatibility with
+  collective methods)
+
 0.9.0
 ~~~~~
 
 * code separated from ``lck.django``
 
-* support for collective sort using queryset-like ``order_by`` on a chain
+* support for collective sort using QuerySet-like ``order_by`` on a chain
 
 * fix for slices with custom steps
 
