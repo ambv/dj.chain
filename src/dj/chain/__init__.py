@@ -78,6 +78,8 @@ class chain(object):
         self.step = None
         self.strict = kwargs.get('strict', False)
         self.xsort = []
+        self.xvalues_mode = None
+        self.xvalues_fields = ()
         if self.strict:
             self._django_factory = self._strict_django_factory
         else:
@@ -116,6 +118,8 @@ class chain(object):
         result.xform = self.xform
         result.xkey = self.xkey
         result.xsort = list(self.xsort)
+        result.xvalues_mode = self.xvalues_mode
+        result.xvalues_fields = list(self.xvalues_fields)
         result.start = self.start
         result.stop = self.stop
         result.step = self.step
@@ -174,7 +178,55 @@ class chain(object):
                 continue
             if self.stop and index >= self.stop:
                 break
-            yield self.xform(element)
+            yield self.xform(self.xvalue(element))
+
+    def xvalue(self, value):
+        """For each field listed in ``xvalues_fields`` try to:
+
+            * use an item of the specified name on the object, if exists
+
+            * call a method of the specified name on the object, if exists
+
+            * use an attribute of the specified name on the object, if exists
+
+            * raise an ``AttributeError`` otherwise
+
+        Return the fiels as a dictionary, list of tuples or a flat list
+        depending on the ``xvalue_mode``.
+        """
+        if not self.xvalues_mode:
+            return value
+        result = self.xvalues_mode()
+        if isinstance(result, tuple):
+            # flat list
+            field = self.xvalues_fields[0]
+            try:
+                return value[field]
+            except TypeError:
+                pass
+            v = getattr(value, field)
+            return v() if callable(v) else v
+        if isinstance(result, list):
+            # regular list
+            for field in self.xvalues_fields:
+                try:
+                    result.append(value[field])
+                    continue
+                except TypeError:
+                    pass
+                v = getattr(value, field)
+                result.append(v() if callable(v) else v)
+            result = tuple(result)
+        else:
+            for field in self.xvalues_fields:
+                try:
+                    result[field] = value[field]
+                    continue
+                except TypeError:
+                    pass
+                v = getattr(value, field)
+                result[field] = v() if callable(v) else v
+        return result
 
     def __getitem__(self, key):
         if isinstance(key, slice):
@@ -335,3 +387,47 @@ class chain(object):
         """QuerySet-compatible ``using`` method. Will silently skip filtering
         for incompatible iterables."""
         return self._django_factory('using', *args, **kwargs)
+
+    def values(self, *fields):
+        """QuerySet-compatible ``values`` method. If ``fields`` are not
+        specified, results from non-QuerySet-like iterables are returned as-is.
+        Otherwise, each result is converted to a dictionary using the ``xvalue``
+        algorithm.
+
+        Note: if you use ``xform``, it will receive a dictionary after calling
+        this method.
+        """
+        result = self._django_factory('values', *fields)
+        if fields:
+            result.xvalues_mode = dict
+            result.xvalues_fields = fields
+        else:
+            result.xvalues_mode = None
+            result.xvalues_fields = ()
+        return result
+
+    def values_list(self, *fields, **kwargs):
+        """QuerySet-compatible ``values_list`` method. If ``fields`` are not
+        specified, results from non-QuerySet-like iterables are returned as-is.
+        Otherwise, each result is converted to a list of values using the
+        ``xvalue`` algorithm.
+
+        Note: if you use ``xform``, it will receive a list of values after
+        calling this method.
+        """
+        flat = kwargs.pop('flat', False)
+        if kwargs:
+            raise TypeError('Unexpected keyword arguments to values_list: %s'
+                    % (kwargs.keys(),))
+        if flat and len(fields) > 1:
+            raise TypeError("'flat' is not valid when values_list is called "
+                            "with more than one field.")
+        if fields:
+            result = self.copy()
+            result.xvalues_mode = tuple if flat else list
+            result.xvalues_fields = fields
+        else:
+            result = self._django_factory('values_list', *fields)
+            result.xvalues_mode = None
+            result.xvalues_fields = ()
+        return result

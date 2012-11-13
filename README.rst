@@ -153,6 +153,21 @@ the cumulative result to be ordered correctly. An example::
    <Video: Psy - Gangnam Style (253 s at 1080p)>,
    <Video: Shakira - Waka Waka (211 s at 480p)>]
 
+You can also use the cumulative ``values`` and ``values_list`` transformations::
+
+  >>> media = chain(mt.Video.objects.all(), mt.books)
+  >>> list(media.values('title'))
+  [{'title': u'Gangnam Style'}, {'title': u'Baby'}, {'title': u'Bad Romance'},
+   {'title': u'Waka Waka'}, {'title': u'A Tale of Two Cities'},
+   {'title': u'Don Quixote'}]
+  >>> list(media.values_list('title', 'author'))
+  [(u'Gangnam Style', u'Psy'), (u'Baby', u'Justin Bieber'),
+   (u'Bad Romance', u'Lady Gaga'), (u'Waka Waka', u'Shakira'),
+   (u'A Tale of Two Cities', u'Charles Dickens'),
+   (u'Don Quixote', u'Miguel de Cervantes')]
+  >>> list(media.values_list('author', flat=True))
+  [u'Psy', u'Justin Bieber', u'Lady Gaga', u'Shakira', u'Charles Dickens',
+   u'Miguel de Cervantes']
 
 Custom filtering, sorting and transformations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -243,10 +258,6 @@ release:
 
 * ``update``
 
-* ``values_list``
-
-* ``values``
-
 
 Known issues
 ------------
@@ -280,6 +291,8 @@ Change Log
 
 0.9.1
 ~~~~~
+
+* support for collective ``values`` and ``values_list`` transformations
 
 * support for collective ``defer``, ``extra``, ``only``, ``prefetch_related``,
   ``select_for_update``, ``select_related`` and ``using`` methods (silently
