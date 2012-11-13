@@ -210,6 +210,44 @@ Note that methods with custom handling of other itables (like ``count`` and
 ``order_by``) still work.
 
 
+Unsupported methods
+-------------------
+
+The following methods cannot be supported in a heterogenic context:
+
+* ``create``
+
+* ``get_or_create``
+
+* ``bulk_create``
+
+
+Methods below are not supported yet but the support is planned in a future
+release:
+
+* ``aggregate``
+
+* ``annotate``
+
+* ``dates``
+
+* ``delete``
+
+* ``distinct``
+
+* ``get``
+
+* ``in_bulk``
+
+* ``reverse``
+
+* ``update``
+
+* ``values_list``
+
+* ``values``
+
+
 Known issues
 ------------
 
