@@ -40,7 +40,7 @@ class chain(object):
     """Enables chaining multiple iterables to serve them lazily as
     a QuerySet-compatible object. Supports collective ``count()``, ``defer``,
     ``exists()``, ``exclude``, ``extra``, ``filter``, ``only``, ``order_by``,
-    ``select_related`` and ``using`` methods.
+    ``prefetch_related``, ``select_related`` and ``using`` methods.
 
     Provides special overridable static methods used while yielding values:
 
@@ -229,6 +229,7 @@ class chain(object):
         return length + 1
 
     def _default_django_factory(self, _method, *args, **kwargs):
+        """Used if strict=False while constructing the chain."""
         new_iterables = []
         for it in self.iterables:
             try:
@@ -238,6 +239,7 @@ class chain(object):
         return self.copy(*new_iterables)
 
     def _strict_django_factory(self, _method, *args, **kwargs):
+        """Used if strict=True while constructing the chain."""
         # imported here to avoid settings.py bootstrapping issues
         from django.db.models.query import QuerySet
         new_iterables = []
@@ -309,9 +311,14 @@ class chain(object):
         except TypeError:
             return True
 
+    def prefetch_related(self, *args, **kwargs):
+        """QuerySet-compatible ``prefetch_related`` method. Will silently skip
+        filtering for incompatible iterables."""
+        return self._django_factory('prefetch_related', *args, **kwargs)
+
     def select_related(self, *args, **kwargs):
-        """QuerySet-compatible ``select_related`` method. Will silently skip filtering
-        for incompatible iterables."""
+        """QuerySet-compatible ``select_related`` method. Will silently skip
+        filtering for incompatible iterables."""
         return self._django_factory('select_related', *args, **kwargs)
 
     def using(self, *args, **kwargs):
