@@ -40,7 +40,8 @@ class chain(object):
     """Enables chaining multiple iterables to serve them lazily as
     a QuerySet-compatible object. Supports collective ``count()``, ``defer``,
     ``exists()``, ``exclude``, ``extra``, ``filter``, ``only``, ``order_by``,
-    ``prefetch_related``, ``select_related`` and ``using`` methods.
+    ``prefetch_related``, ``select_for_update``, ``select_related`` and
+    ``using`` methods.
 
     Provides special overridable static methods used while yielding values:
 
@@ -315,6 +316,11 @@ class chain(object):
         """QuerySet-compatible ``prefetch_related`` method. Will silently skip
         filtering for incompatible iterables."""
         return self._django_factory('prefetch_related', *args, **kwargs)
+
+    def select_for_update(self, *args, **kwargs):
+        """QuerySet-compatible ``select_for_update`` method. Will silently skip
+        filtering for incompatible iterables."""
+        return self._django_factory('select_for_update', *args, **kwargs)
 
     def select_related(self, *args, **kwargs):
         """QuerySet-compatible ``select_related`` method. Will silently skip

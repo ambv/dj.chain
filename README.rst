@@ -191,6 +191,8 @@ object. These are:
 
 * ``prefetch_related``
 
+* ``select_for_update``
+
 * ``select_related``
 
 * ``using``
@@ -242,8 +244,8 @@ Change Log
 ~~~~~
 
 * support for collective ``defer``, ``extra``, ``only``, ``prefetch_related``,
-  ``select_related`` and ``using`` methods (silently ignored for incompatible
-  iterables)
+  ``select_for_update``, ``select_related`` and ``using`` methods (silently
+  ignored for incompatible iterables)
 
 * strict mode (non-QuerySet objects are not tried for compatibility with
   collective methods)
