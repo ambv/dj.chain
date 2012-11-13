@@ -307,6 +307,10 @@ class chain(object):
 
     @property
     def ordered(self):
+        """``True`` if the chain is ordered — i.e. has an ``order_by()``
+        clause or a default ``xkey`` ordering. ``False`` otherwise.
+
+        Compatible with QuerySet.ordered."""
         try:
             return len(self.xsort) or self.xkey() is not unset
         except TypeError:
