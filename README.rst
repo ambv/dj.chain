@@ -221,7 +221,7 @@ constructing a chain::
   c = chain(Article.objects.all(), custom_entries, strict=True)
 
 In this case the above methods will only be called on actual QuerySet instances.
-Note that methods with custom handling of other itables (like ``count`` and
+Note that methods with custom handling of other iterables (like ``count`` and
 ``order_by``) still work.
 
 
