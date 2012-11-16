@@ -301,6 +301,9 @@ Change Log
 * strict mode (non-QuerySet objects are not tried for compatibility with
   collective methods)
 
+* fixed an import error due to incomplete separation from ``lck.django``
+
+
 0.9.0
 ~~~~~
 

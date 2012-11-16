@@ -33,7 +33,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from django.core.exceptions import FieldError
-from lck.lang import unset
+from null import unset
 
 
 class chain(object):
