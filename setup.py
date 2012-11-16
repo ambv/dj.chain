@@ -38,7 +38,7 @@ finally:
 
 setup (
     name = 'dj.chain',
-    version = '0.9.0',
+    version = '0.9.1',
     author = 'Łukasz Langa',
     author_email = 'lukasz@langa.pl',
     description = "An object that enables chaining multiple iterables to serve"
