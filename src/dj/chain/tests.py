@@ -28,7 +28,9 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.test import TestCase
+from django.utils.unittest import skipUnless
 
 
 class SimpleTest(TestCase):
@@ -173,6 +175,7 @@ class SimpleTest(TestCase):
         self.test_chain_sorted(c2)
 
 
+@skipUnless("dj._chaintestproject.app" in settings.INSTALLED_APPS)
 class MediaTest(TestCase):
     def setUp(self):
         from dj._chaintestproject.app.models import Video, Song
