@@ -175,7 +175,8 @@ class SimpleTest(TestCase):
         self.test_chain_sorted(c2)
 
 
-@skipUnless("dj._chaintestproject.app" in settings.INSTALLED_APPS)
+@skipUnless("dj._chaintestproject.app" in settings.INSTALLED_APPS,
+            "Requires the dj._chaintestproject.app to be installed.")
 class MediaTest(TestCase):
     def setUp(self):
         from dj._chaintestproject.app.models import Video, Song
