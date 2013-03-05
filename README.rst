@@ -2,6 +2,9 @@
 dj.chain
 ========
 
+.. image:: https://secure.travis-ci.org/ambv/dj.chain.png
+  :target: https://secure.travis-ci.org/ambv/dj.chain
+
 This module provides a way to chain multiple finite iterables for consumption as
 a QuerySet-compatible object.
 
