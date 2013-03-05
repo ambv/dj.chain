@@ -143,8 +143,8 @@ LOGGING = {
 import os
 import dj.chain
 
-BASE_PATH = os.path.dirname(os.path.realpath(os.path.join(__file__, '..')))
-TEST_DISCOVERY_ROOT = os.path.dirname(dj.chain.__file__)
+BASE_PATH = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
+TEST_DISCOVERY_ROOT = os.path.realpath(os.path.dirname(dj.chain.__file__))
 TEST_RUNNER = "dj._chaintestproject.DiscoveryDjangoTestSuiteRunner"
 
 import django
