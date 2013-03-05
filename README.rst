@@ -293,7 +293,7 @@ Change Log
 ----------
 
 0.9.2
------
+~~~~~
 
 * Long overdue Python 3 support (considered experimental)
 
