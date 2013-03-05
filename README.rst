@@ -289,6 +289,12 @@ The easiest way would be to run::
 Change Log
 ----------
 
+0.9.2
+-----
+
+* Long overdue Python 3 support (considered experimental)
+
+
 0.9.1
 ~~~~~
 

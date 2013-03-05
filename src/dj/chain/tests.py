@@ -171,7 +171,7 @@ class SimpleTest(TestCase):
         c.xform = lambda v: int(v)
         c.xkey = lambda v: -int(v)
         c.xfilter = lambda v: int(v) % 2 == 0
-        c2 = c._django_factory("__getslice__", 1, 3)
+        c2 = c._django_factory("__getitem__", slice(1, 3))
         self.test_chain_sorted(c2)
 
 

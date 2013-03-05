@@ -35,6 +35,8 @@ from __future__ import unicode_literals
 from django.core.exceptions import FieldError
 from null import unset
 
+import six
+
 
 class chain(object):
     """Enables chaining multiple iterables to serve them lazily as
@@ -128,9 +130,9 @@ class chain(object):
 
     def _filtered_next(self, iterator):
         """Raises StopIteration just like regular iterator.next()."""
-        result = iterator.next()
+        result = six.next(iterator)
         while not self.xfilter(result):
-            result = iterator.next()
+            result = six.next(iterator)
         return result
 
     def __iter__(self):
@@ -145,7 +147,7 @@ class chain(object):
                     except StopIteration:
                         continue
                 while candidates:
-                    clist = candidates.values()
+                    clist = list(candidates.values())
                     for rule in self.xsort[::-1]:
                         reverse = rule[0] == '-'
                         if reverse:
